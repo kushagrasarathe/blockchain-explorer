@@ -1,10 +1,11 @@
 import Provider from "@/components/provider";
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Inter as FontSans } from "next/font/google";
 import "./globals.css";
 
-const font = Inter({
+const font = FontSans({
   subsets: ["latin"],
+  variable: "--font-sans",
 });
 
 export const metadata: Metadata = {
@@ -21,7 +22,7 @@ export default function RootLayout({
     <html lang="en">
       <body className={font.className}>
         <Provider>
-          <div className="p-4 w-full">{children}</div>
+          <div className="w-full p-4">{children}</div>
         </Provider>
       </body>
     </html>

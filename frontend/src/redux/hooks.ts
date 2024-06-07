@@ -5,4 +5,5 @@ export const useAppDispatch = () => useDispatch<AppDispatch>();
 export const useAppSelector: TypedUseSelectorHook<RootState> = useSelector;
 
 // Selector hooks for utilization
-export const useGameStore = () => useAppSelector((state) => state.game);
+export const useTransactionsStore = () =>
+  useAppSelector((state) => state.transactions);
