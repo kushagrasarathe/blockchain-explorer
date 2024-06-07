@@ -12,6 +12,7 @@ export class DataSyncService {
   constructor(
     @InjectModel(Block.name) private blockModel: Model<Block>,
     @InjectModel(Transaction.name) private transactionModel: Model<Transaction>,
+    @InjectModel(Event.name) private eventModel: Model<Event>,
     private blockchainService: BlockchainService,
   ) {}
 
@@ -81,5 +82,55 @@ export class DataSyncService {
         }
       }
     }, 30000); // 30 seconds
+  }
+
+  async syncTransaction(tx: any, blockData: any) {
+    const txModel = await this.transactionModel.findOneAndUpdate(
+      { transactionHash: tx.transaction_hash },
+      {
+        blockNumber: blockData.block_number,
+        type: tx.type,
+        timestamp: blockData.timestamp,
+        senderAddress: tx.contract_address,
+        version: tx.version,
+        maxFee: tx.max_fee,
+        nonce: tx.nonce,
+        calldata: tx.calldata,
+        signature: tx.signature,
+      },
+      { upsert: true, new: true },
+    );
+
+    if (tx.type === 'INVOKE' && tx.version === '0x1') {
+      const receipt = await this.blockchainService.getTransactionReceipt(
+        tx.transaction_hash,
+      );
+      const actualFee = receipt.actual_fee;
+      const l1GasPrice = blockData.l1_gas_price;
+      const gasConsumed = BigInt(actualFee) / BigInt(l1GasPrice);
+
+      await txModel.updateOne({
+        actualFee,
+        l1GasPrice,
+        gasConsumed: gasConsumed.toString(),
+        status: receipt.status,
+        executionResources: receipt.execution_resources,
+      });
+
+      await this.syncEvents(tx.transaction_hash, blockData.block_number);
+    }
+  }
+
+  async syncEvents(txHash: string, blockNumber: number) {
+    const receipt = await this.blockchainService.getTransactionReceipt(txHash);
+    for (const [index, event] of receipt.events.entries()) {
+      await this.eventModel.create({
+        transactionHash: txHash,
+        blockNumber,
+        index,
+        keys: event.keys,
+        data: event.data,
+      });
+    }
   }
 }

@@ -5,6 +5,7 @@
     "source.fixAll": "explicit",
     "source.organizeImports": "explicit"
   },
+
   "[dockerfile]": {
     "editor.defaultFormatter": "ms-azuretools.vscode-docker"
   },

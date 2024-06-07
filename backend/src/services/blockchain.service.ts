@@ -35,4 +35,22 @@ export class BlockchainService {
       throw error;
     }
   }
+
+  async getTransactionReceipt(txHash: string) {
+    try {
+      const response = await axios.post(this.apiUrl, {
+        jsonrpc: '2.0',
+        method: 'starknet_getTransactionReceipt',
+        params: [txHash],
+        id: 1,
+      });
+      return response.data.result;
+    } catch (error) {
+      this.logger.error(
+        `Failed to get transaction receipt for ${txHash}`,
+        error,
+      );
+      throw error;
+    }
+  }
 }
