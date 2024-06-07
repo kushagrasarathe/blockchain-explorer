@@ -1,18 +1,20 @@
 import {
   Controller,
   Get,
-  Query,
-  Param,
   NotFoundException,
+  Param,
+  Query,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
+import { EthPriceService } from 'src/services/eth-price.service';
 import { Transaction } from '../models/transaction.model';
 
 @Controller('transactions')
 export class TransactionsController {
   constructor(
     @InjectModel(Transaction.name) private transactionModel: Model<Transaction>,
+    private ethPriceService: EthPriceService,
   ) {}
 
   @Get()
@@ -31,11 +33,20 @@ export class TransactionsController {
   }
 
   @Get(':id')
-  async getTransaction(@Param('id') id: string) {
+  async getTransaction(
+    @Param('id') id: string,
+  ): Promise<{ actualFeeUSD: string } & Transaction> {
     const transaction = await this.transactionModel.findOne({
       transactionHash: id,
     });
     if (!transaction) throw new NotFoundException('Transaction not found');
-    return transaction;
+
+    const ethPrice = await this.ethPriceService.getEthPriceAtTimestamp(
+      transaction.timestamp,
+    );
+    const actualFeeUSD =
+      (BigInt(transaction.actualFee || 0) * BigInt(ethPrice)) / BigInt(1e18);
+
+    return { ...transaction.toJSON(), actualFeeUSD: actualFeeUSD.toString() };
   }
 }
