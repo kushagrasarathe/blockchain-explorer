@@ -7,6 +7,8 @@ import {
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
+import { PaginatedQueryDto } from 'src/dto/paginated-query.dto';
+import { ValidationPipe } from 'src/pipes/validation.pipe';
 import { EthPriceService } from 'src/services/eth-price.service';
 import { Transaction } from '../models/transaction.model';
 
@@ -19,10 +21,11 @@ export class TransactionsController {
 
   @Get()
   async getLatestTransactions(
-    @Query('type') type?: string,
-    @Query('page') page = 1,
+    @Query(new ValidationPipe()) query: PaginatedQueryDto,
   ) {
-    const query = type ? { type } : {};
+    const { page = 1 } = query;
+    // const query = type ? { type } : {};
+
     const transactions = await this.transactionModel
       .find(query)
       .sort({ blockNumber: -1, timestamp: -1 })
