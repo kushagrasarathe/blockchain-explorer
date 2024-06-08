@@ -81,7 +81,7 @@ export class DataSyncService {
           await this.syncBlock(blockNumber);
         }
       }
-    }, 30000); // 30 seconds
+    }, 300000); // 5 mins
   }
 
   async syncTransaction(tx: any, blockData: any) {
