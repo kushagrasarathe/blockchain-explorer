@@ -16,8 +16,8 @@ export const fetchLatestTransactions = async (page = 1, type?: string) => {
   return data;
 };
 
-export const fetchTransaction = async (id: string) => {
-  const { data } = await axios.get(`/transactions/${id}`);
+export const fetchTransaction = async (txHash: string) => {
+  const { data } = await axios.get(`/transactions/${txHash}`);
   return data;
 };
 

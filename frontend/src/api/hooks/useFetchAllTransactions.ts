@@ -2,7 +2,7 @@ import { axios } from "@/api";
 import { ALL_TRANSACTIONS } from "@/lib/constants/query";
 import { useInfiniteQuery } from "@tanstack/react-query";
 
-export const useFetchAllTransactions = () => {
+export const useFetchAllTransactions = (dependsOn = true) => {
   const fetchLatestTransactions = async ({
     pageParam = 1,
     size = 20,
@@ -25,8 +25,9 @@ export const useFetchAllTransactions = () => {
   return useInfiniteQuery({
     queryKey: [ALL_TRANSACTIONS],
     queryFn: fetchLatestTransactions,
-    initialPageParam: 1,
-    retry: 0,
+    retry: 5000,
+    enabled: dependsOn,
+    keepPreviousData: true,
     getPreviousPageParam: (firstPage) => firstPage.previousId ?? undefined,
     getNextPageParam: (lastPage, allPages) => {
       return lastPage.length ? allPages.length + 1 : undefined;

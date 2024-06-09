@@ -5,14 +5,6 @@ export type TTransactionType =
   | "INVOKE"
   | "L1_HANDLER";
 
-// export enum TTransactionType {
-//   DECLARE = "declare",
-//   DEPLOY = "deploy",
-//   DEPLOY_ACCOUNT = "deploy_account",
-//   INVOKE = "invoke",
-//   L1_HANDLER = "l1_handler",
-// }
-
 export type TTransaction = {
   _id: string;
   transactionHash: string;
@@ -27,4 +19,19 @@ export type TTransaction = {
   updatedAt: string;
   version: number;
   actualFeeUSD?: string;
+};
+
+export type TTransactionDetails = {
+  _id: number;
+  transactionHash: string;
+  __v: number;
+  blockNumber: number;
+  calldata: string[];
+  createdAt: string;
+  signature: string[];
+  timestamp: number;
+  type: TTransactionType;
+  updatedAt: string;
+  version: number;
+  actualFeeUSD: string;
 };

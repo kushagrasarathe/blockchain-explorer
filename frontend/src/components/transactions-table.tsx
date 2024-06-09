@@ -13,7 +13,7 @@ import Link from "next/link";
 import CopyToClipboard from "./copy-to-clipboard";
 import TransactionBadge from "./ui/transaction-badge";
 
-const columns = ["STATUS", "HASH", "TYPE", "BLOCK", "AGE"];
+const columns = ["HASH", "TYPE", "BLOCK", "AGE"];
 
 export default function TransactionsTable({
   transactions,
@@ -36,17 +36,22 @@ export default function TransactionsTable({
               key={transaction._id}
               className="dark:hover:bg-secondary-2"
             >
-              <TableCell className="font-medium">
-                {transaction.signature || "N/A"}
-              </TableCell>
               <TableCell>
                 {transaction.transactionHash ? (
                   <div className="flex w-28 items-center justify-between gap-2">
-                    <Link href={`/tx/${transaction.transactionHash}`}>
+                    {transaction.type === "INVOKE" &&
+                    transaction.version === 1 &&
+                    !!transaction.transactionHash.length ? (
+                      <Link href={`/tx/${transaction.transactionHash}`}>
+                        <span className="text-foreground-secondary">
+                          {truncateHash(transaction.transactionHash)}
+                        </span>
+                      </Link>
+                    ) : (
                       <span className="text-foreground-secondary">
                         {truncateHash(transaction.transactionHash)}
                       </span>
-                    </Link>
+                    )}
                     <CopyToClipboard text={transaction.transactionHash} />
                   </div>
                 ) : (

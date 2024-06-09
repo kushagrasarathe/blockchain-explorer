@@ -44,18 +44,22 @@ export default function Transactions() {
   return (
     <Card className="w-full rounded-lg p-2 dark:bg-secondary-default">
       <CardHeader>
-        <CardTitle>Transactions</CardTitle>
+        <CardTitle className="font-normal">Transactions</CardTitle>
         <CardDescription>A list of transactions on Starknet</CardDescription>
       </CardHeader>
 
       <CardContent className="space-y-4">
-        {status === "pending" ? (
+        {status === "loading" ? (
           <div className="flex w-full items-center justify-center">
             <Loader />
           </div>
         ) : status === "error" ? (
           <div className="p-2 text-center text-red-500">
-            Error: {error.message}
+            Error:{" "}
+            {
+              // @ts-ignore
+              error?.message ?? "An error occurred"
+            }
           </div>
         ) : (
           <>
