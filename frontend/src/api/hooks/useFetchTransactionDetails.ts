@@ -17,7 +17,7 @@ export const useFetchTransactionDetails = (
   };
 
   async function onSuccess(data: TTransactionDetails) {
-    console.log("data", data);
+    // console.log("data", data);
     dispatch(transactionsActions.setTransactionDetails(data));
   }
 

@@ -3,6 +3,5 @@
 @tailwind utilities;
 
 body {
-    @apply bg-primary text-foreground w-full p-4 md:max-w-7xl mx-auto;
-    /* color: #202e26; */
+    @apply bg-primary text-foreground w-full p-4 md:max-w-7xl mx-auto py-20;
 }

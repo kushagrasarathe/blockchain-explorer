@@ -1,6 +1,7 @@
 "use client";
 
 import { useFetchTransactionDetails } from "@/api/hooks/useFetchTransactionDetails";
+import { useFetchTransactionEvents } from "@/api/hooks/useFetchTransactionEvents";
 import { formatTimestampToDate } from "@/lib/utils";
 import { useTransactionsStore } from "@/redux/hooks";
 import { TTransactionType } from "@/types/transactions";
@@ -17,8 +18,13 @@ export default function TransactionDetails({ txHash }: { txHash: string }) {
     txHash,
     !transactionDetails,
   );
+  const {
+    data: txEvents,
+    error: txEventsError,
+    isFetching: isFetchingTxEvents,
+  } = useFetchTransactionEvents(txHash, !transactionDetails);
 
-  console.log(transactionDetails);
+  // console.log(transactionDetails);
   if (isFetching) {
     return <div>Loading...</div>;
   }
