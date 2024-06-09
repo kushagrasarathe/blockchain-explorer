@@ -1,0 +1,2 @@
+export const ALL_TRANSACTIONS = "ALL_TRANSACTIONS";
+export const TRANSACTION = "TRANSACTION";

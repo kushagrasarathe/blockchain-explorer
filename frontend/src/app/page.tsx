@@ -1,3 +1,5 @@
+import AllTransactions from "@/components/all-transactions";
+
 export default function page() {
-  return <div>Welcom</div>;
+  return <AllTransactions />;
 }
