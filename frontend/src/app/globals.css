@@ -4,5 +4,5 @@
 
 body {
     @apply bg-primary text-foreground w-full p-4 md:max-w-7xl mx-auto;
-    /* background-color: #4b4b4b; */
+    /* color: #202e26; */
 }

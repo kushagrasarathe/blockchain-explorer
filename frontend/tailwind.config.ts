@@ -26,6 +26,7 @@ const config = {
           "2": "#4b4b4b",
         },
         foreground: "#ffffff",
+        "foreground-secondary": "#8ba3df",
         // accent: "#000000",
         // neutral: "#000000",
       },

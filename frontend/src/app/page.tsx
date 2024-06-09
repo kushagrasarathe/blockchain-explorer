@@ -1,9 +1,9 @@
-import AllTransactions from "@/components/all-transactions";
+import Transactions from "@/components/transactions";
 
 export default function page() {
   return (
-    <div className="flex min-h-screen items-center justify-center">
-      <AllTransactions />
+    <div className="flex min-h-screen items-start justify-center py-20">
+      <Transactions />
     </div>
   );
 }
