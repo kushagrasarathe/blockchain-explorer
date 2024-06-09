@@ -19,6 +19,16 @@ const config = {
       },
     },
     extend: {
+      colors: {
+        primary: "#121212",
+        secondary: {
+          default: "#1b1b1b",
+          "2": "#4b4b4b",
+        },
+        foreground: "#ffffff",
+        // accent: "#000000",
+        // neutral: "#000000",
+      },
       fontFamily: {
         sans: ["var(--font-sans)", ...fontFamily.sans],
       },
