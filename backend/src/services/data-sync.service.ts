@@ -1,6 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
+import { TransactionType } from 'src/types';
 import { Block } from '../models/block.model';
 import { Transaction } from '../models/transaction.model';
 import { BlockchainService } from './blockchain.service';
@@ -45,7 +46,7 @@ export class DataSyncService {
     if (blockData && blockData.transactions) {
       for (const tx of blockData.transactions) {
         await this.transactionModel.findOneAndUpdate(
-          { transactionHash: tx.transaction_hash },
+          { transactionHash: tx.transactionHash },
           {
             blockNumber: blockData?.block_number,
             type: tx.type,
@@ -58,7 +59,10 @@ export class DataSyncService {
         );
 
         // If it's an INVOKE transaction, fetch and save more details
-        if (tx.type === 'INVOKE' && tx.version === '0x1') {
+        if (
+          tx.type === ('INVOKE' as TransactionType) &&
+          tx.version === ('0x1' as any)
+        ) {
           // Fetch and save additional details
         }
       }
@@ -114,7 +118,7 @@ export class DataSyncService {
         l1GasPrice,
         gasConsumed: gasConsumed.toString(),
         status: receipt.status,
-        executionResources: receipt.execution_resources,
+        executionResources: receipt.executionResources,
       });
 
       await this.syncEvents(tx.transaction_hash, blockData.block_number);

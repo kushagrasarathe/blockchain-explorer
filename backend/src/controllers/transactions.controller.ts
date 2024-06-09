@@ -23,14 +23,15 @@ export class TransactionsController {
   async getLatestTransactions(
     @Query(new ValidationPipe()) query: PaginatedQueryDto,
   ) {
-    const { page = 1 } = query;
-    // const query = type ? { type } : {};
+    const { page = 1, size = 10, type } = query;
+
+    const filter = type ? { type } : {};
 
     const transactions = await this.transactionModel
-      .find(query)
+      .find(filter)
       .sort({ blockNumber: -1, timestamp: -1 })
-      .skip((page - 1) * 20)
-      .limit(20);
+      .skip((page - 1) * size)
+      .limit(size);
 
     return transactions;
   }

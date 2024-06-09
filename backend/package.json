@@ -25,11 +25,14 @@
     "@nestjs/mongoose": "^10.0.6",
     "@nestjs/platform-express": "^10.0.0",
     "axios": "^1.7.2",
+    "axios-rate-limit": "^1.4.0",
+    "bottleneck": "^2.19.5",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.1",
     "dotenv": "^16.4.5",
     "mongoose": "^8.4.1",
     "reflect-metadata": "^0.2.0",
+    "request-rate-limiter": "^2.0.3",
     "rxjs": "^7.8.1"
   },
   "devDependencies": {
