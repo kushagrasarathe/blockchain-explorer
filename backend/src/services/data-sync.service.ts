@@ -1,7 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { TransactionType } from 'src/types';
 import { Block } from '../models/block.model';
 import { Transaction } from '../models/transaction.model';
 import { BlockchainService } from './blockchain.service';
@@ -19,10 +18,11 @@ export class DataSyncService {
 
   async syncInitialData() {
     const latestBlock = await this.blockchainService.getLatestBlockNumber();
-    const startBlock = Math.max(0, latestBlock - 10);
+    // const startBlock = Math.max(0, latestBlock - 10);
+    // console.log('startBlock', startBlock);
 
     for (
-      let blockNumber = startBlock;
+      let blockNumber = latestBlock - 10;
       blockNumber <= latestBlock;
       blockNumber++
     ) {
@@ -46,25 +46,29 @@ export class DataSyncService {
     if (blockData && blockData.transactions) {
       for (const tx of blockData.transactions) {
         await this.transactionModel.findOneAndUpdate(
-          { transactionHash: tx.transactionHash },
+          { transactionHash: tx.transaction_hash },
           {
-            blockNumber: blockData?.block_number,
+            transaction_hash: tx.transaction_hash,
             type: tx.type,
-            timestamp: blockData?.timestamp,
-            senderAddress: tx.contract_address,
             version: tx.version,
-            // Add more fields as needed
+            nonce: tx.nonce,
+            max_fee: tx.max_fee,
+            sender_address: tx.sender_address,
+            signature: tx.signature,
+            calldata: tx.calldata,
+            blockNumber: blockData?.block_number,
+            timestamp: blockData?.timestamp,
           },
           { upsert: true, new: true },
         );
 
-        // If it's an INVOKE transaction, fetch and save more details
-        if (
-          tx.type === ('INVOKE' as TransactionType) &&
-          tx.version === ('0x1' as any)
-        ) {
-          // Fetch and save additional details
-        }
+        // // If it's an INVOKE transaction, fetch and save more details
+        // if (
+        //   tx.type === ('INVOKE' as TransactionType) &&
+        //   tx.version === ('0x1' as any)
+        // ) {
+        //   // Fetch and save additional details
+        // }
       }
     }
   }
@@ -93,32 +97,38 @@ export class DataSyncService {
       { transactionHash: tx.transaction_hash },
       {
         blockNumber: blockData.block_number,
-        type: tx.type,
         timestamp: blockData.timestamp,
-        senderAddress: tx.contract_address,
-        version: tx.version,
         maxFee: tx.max_fee,
+        senderAddress: tx.contract_address,
         nonce: tx.nonce,
+        type: tx.type,
+        version: tx.version,
         calldata: tx.calldata,
         signature: tx.signature,
       },
       { upsert: true, new: true },
     );
 
-    if (tx.type === 'INVOKE' && tx.version === '0x1') {
+    if (tx.type === 'INVOKE' && tx.version === 1) {
       const receipt = await this.blockchainService.getTransactionReceipt(
         tx.transaction_hash,
       );
-      const actualFee = receipt.actual_fee;
+      const actual_fee = receipt.actual_fee;
       const l1GasPrice = blockData.l1_gas_price;
-      const gasConsumed = BigInt(actualFee) / BigInt(l1GasPrice);
+      const gasConsumed = Number(actual_fee.amount) / l1GasPrice;
 
       await txModel.updateOne({
-        actualFee,
-        l1GasPrice,
+        actual_fee,
         gasConsumed: gasConsumed.toString(),
-        status: receipt.status,
-        executionResources: receipt.executionResources,
+        type: receipt.type,
+        transactionHash: receipt.transaction_hash,
+        execution_status: receipt.execution_status,
+        finality_status: receipt.finality_status,
+        block_hash: receipt.block_hash,
+        block_number: receipt.block_number,
+        messages_sent: receipt.messages_sent,
+        events: receipt.events,
+        execution_resources: receipt.execution_resources,
       });
 
       await this.syncEvents(tx.transaction_hash, blockData.block_number);

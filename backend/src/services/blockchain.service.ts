@@ -1,12 +1,21 @@
 import { HttpException, HttpStatus, Injectable, Logger } from '@nestjs/common';
 import axios, { AxiosResponse } from 'axios';
 import Bottleneck from 'bottleneck';
-import { Block, StarknetResponse, TransactionReceipt } from 'src/types';
+import * as dotenv from 'dotenv';
+import {
+  Block,
+  StarknetResponse,
+  TBlockNumberResponse,
+  TransactionReceipt,
+} from 'src/types';
+
+dotenv.config();
 
 @Injectable()
 export class BlockchainService {
   private readonly logger = new Logger(BlockchainService.name);
-  private readonly apiUrl = 'https://free-rpc.nethermind.io/mainnet-juno';
+  // private readonly apiUrl = 'htt://free-rpc.nethermind.io/mainnet-juno';
+  private readonly apiUrl = process.env.BLAST_API;
   private readonly client = axios.create({
     baseURL: this.apiUrl,
     headers: { 'Content-Type': 'application/json' },
@@ -72,19 +81,32 @@ export class BlockchainService {
   }
 
   async getLatestBlockNumber(): Promise<number> {
-    const result = await this.request<string>('starknet_blockNumber', []);
-    return parseInt(result, 16);
+    const result = await this.request<TBlockNumberResponse>(
+      'starknet_blockNumber',
+      [],
+    );
+    // const block = Number(result) - 10;
+    const block = Number(result);
+    // console.log('latest block', block);
+    // console.log('result', result);
+    return block;
   }
 
   async getBlockWithTransactions(blockNumber: number): Promise<Block> {
-    return this.request<Block>('starknet_getBlockWithTxs', [
+    const data = this.request<Block>('starknet_getBlockWithTxs', [
       { block_number: blockNumber },
     ]);
+
+    // console.log(await data);
+    return data;
   }
 
   async getTransactionReceipt(txHash: string): Promise<TransactionReceipt> {
-    return this.request<TransactionReceipt>('starknet_getTransactionReceipt', [
-      txHash,
-    ]);
+    const data = this.request<TransactionReceipt>(
+      'starknet_getTransactionReceipt',
+      [txHash],
+    );
+    console.log(await data);
+    return data;
   }
 }

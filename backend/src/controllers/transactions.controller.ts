@@ -49,7 +49,7 @@ export class TransactionsController {
       transaction.timestamp,
     );
     const actualFeeUSD =
-      (BigInt(transaction.actualFee || 0) * BigInt(ethPrice)) / BigInt(1e18);
+      (Number(transaction.actual_fee || 0) * Number(ethPrice)) / Number(1e18);
 
     return { ...transaction.toJSON(), actualFeeUSD: actualFeeUSD.toString() };
   }
