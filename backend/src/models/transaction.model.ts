@@ -5,7 +5,7 @@ import { EventData, ExecutionResources, TransactionType } from 'src/types';
 @Schema({ timestamps: true })
 export class Transaction extends Document {
   @Prop({ required: true, unique: true })
-  transaction_hash: string;
+  transactionHash: string;
 
   @Prop({ required: true })
   blockNumber: number;

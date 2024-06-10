@@ -1,6 +1,12 @@
 import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
 
+type DataFormats = {
+  hex: string[];
+  dec: number[];
+  text: string[];
+};
+
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
@@ -100,3 +106,28 @@ export function truncateHash(
   }
   return `${hash.slice(0, startLength)}...${hash.slice(-endLength)}`;
 }
+
+export const separateDataFormats = (dataArray: string[]): DataFormats => {
+  const result: DataFormats = {
+    hex: [],
+    dec: [],
+    text: [],
+  };
+
+  dataArray.forEach((data) => {
+    // Check if the data is hexadecimal
+    if (/^0x[0-9a-fA-F]+$/.test(data)) {
+      result.hex.push(data);
+    }
+    // Check if the data is decimal
+    else if (/^\d+$/.test(data)) {
+      result.dec.push(parseInt(data, 10));
+    }
+    // Assume the data is text
+    else {
+      result.text.push(data);
+    }
+  });
+
+  return result;
+};

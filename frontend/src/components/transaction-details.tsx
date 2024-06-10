@@ -5,11 +5,12 @@ import { useFetchTransactionEvents } from "@/api/hooks/useFetchTransactionEvents
 import { formatTimestampToDate } from "@/lib/utils";
 import { useTransactionsStore } from "@/redux/hooks";
 import { TTransactionType } from "@/types/transactions";
-import { LucideLoader2 } from "lucide-react";
+import { Check, LucideLoader2 } from "lucide-react";
 import CopyToClipboard from "./copy-to-clipboard";
 import TransactionDetailsTabs from "./transaction-details-tabs";
 import { Badge } from "./ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
+import { Separator } from "./ui/separator";
 import TransactionBadge from "./ui/transaction-badge";
 
 export default function TransactionDetails({ txHash }: { txHash: string }) {
@@ -68,10 +69,19 @@ export default function TransactionDetails({ txHash }: { txHash: string }) {
 
         <div className="space-y-1">
           <div className="text-sm text-neutral-500">STATUS</div>
-          <Badge className="flex w-fit items-center gap-2 px-3 py-1.5 dark:bg-green-700 dark:text-white hover:dark:bg-green-800">
-            <LucideLoader2 className="size-4 animate-spin" />{" "}
-            <div className="text-xs font-normal">ACCEPTED_ON_L2</div>
-          </Badge>
+          <div className="relative flex items-center">
+            <Badge className="group flex w-fit cursor-pointer items-center gap-2 px-3 py-1.5 hover:pr-5 dark:bg-green-700 dark:text-white hover:dark:bg-green-800">
+              <Check className="size-4 group-hover:translate-x-1" />
+              <div className="text-xs font-normal group-hover:translate-x-1">
+                ACCEPTED_ON_L2
+              </div>
+            </Badge>
+            <Separator className="w-10 dark:bg-gray-400" />
+
+            <div className="flex size-8 items-center justify-center rounded-full border dark:border-gray-400 dark:text-gray-400">
+              <LucideLoader2 className="size-7 animate-spin" />
+            </div>
+          </div>
         </div>
 
         <div>
