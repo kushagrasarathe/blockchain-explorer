@@ -4,21 +4,6 @@ export interface TBlockNumberResponse {
   id: number;
 }
 
-// export interface TTransactionReceiptResponse {
-//   jsonrpc: string;
-//   result: {
-//     type: TransactionType;
-//     transaction_hash: string;
-//     actual_fee: any;
-//     execution_status: string;
-//     finality_status: string;
-//     messages_sent: any[];
-//     events: any[];
-//     execution_resources: any;
-//   };
-//   id: number;
-// }
-
 export interface StarknetResponse<T> {
   jsonrpc: string;
   id: number;
@@ -30,7 +15,7 @@ type ActualFee = {
   unit: string;
 };
 
-type EventData = {
+export type EventData = {
   from_address: string;
   keys: string[];
   data: string[];
@@ -81,27 +66,19 @@ export type TransactionType =
 
 export interface Transaction {
   transaction_hash: string;
+  blockNumber: number;
   type: TransactionType;
-  version: string;
-  nonce: string;
-  max_fee: string;
-  sender_address: string;
-  signature: any[];
-  calldata: any[];
-
-  // transactionHash: string;
-  // _id: string;
-  // __v: number;
-  // nonce: string;
-  // blockNumber: number;
-  // contract_address: string;
-  // calldata: any[];
-  // createdAt: string;
-  // senderAddress: string;
-  // signature: any[];
-  // timestamp: number;
-  // type: TransactionType;
-  // updatedAt: string;
-  // version: number;
-  // actualFeeUSD?: string;
+  calldata?: string[];
+  actual_fee?: string;
+  execution_resources?: ExecutionResources;
+  events?: EventData[];
+  sender_address?: string;
+  unix_timestamp?: number;
+  timestamp?: number;
+  nonce?: string;
+  position?: number;
+  version?: number;
+  signature?: string[];
+  max_fee?: string;
+  gasConsumed?: string;
 }

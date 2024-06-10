@@ -29,6 +29,10 @@ export default function TransactionDetails({ txHash }: { txHash: string }) {
     return <div>Loading...</div>;
   }
 
+  if (!transactionDetails) {
+    return <div>Not Found</div>;
+  }
+
   return (
     <Card className="w-full rounded-lg p-2 dark:bg-secondary-default">
       <CardHeader>

@@ -85,10 +85,7 @@ export class BlockchainService {
       'starknet_blockNumber',
       [],
     );
-    // const block = Number(result) - 10;
     const block = Number(result);
-    // console.log('latest block', block);
-    // console.log('result', result);
     return block;
   }
 
@@ -96,8 +93,6 @@ export class BlockchainService {
     const data = this.request<Block>('starknet_getBlockWithTxs', [
       { block_number: blockNumber },
     ]);
-
-    // console.log(await data);
     return data;
   }
 
@@ -106,7 +101,6 @@ export class BlockchainService {
       'starknet_getTransactionReceipt',
       [txHash],
     );
-    console.log(await data);
     return data;
   }
 }

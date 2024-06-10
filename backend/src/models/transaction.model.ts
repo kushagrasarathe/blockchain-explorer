@@ -1,74 +1,56 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
-import { ExecutionResources, TransactionType } from 'src/types';
-
-// interface ExecutionResources {
-//   steps: number;
-//   memory_holes: number;
-//   range_check_builtin_applications: number;
-//   pedersen_builtin_applications: number;
-//   poseidon_builtin_applications: number;
-//   ec_op_builtin_applications: number;
-//   ecdsa_builtin_applications: number;
-//   bitwise_builtin_applications: number;
-//   keccak_builtin_applications: number;
-// }
+import { EventData, ExecutionResources, TransactionType } from 'src/types';
 
 @Schema({ timestamps: true })
 export class Transaction extends Document {
   @Prop({ required: true, unique: true })
-  transactionHash: string;
+  transaction_hash: string;
 
-  @Prop()
-  actual_fee: number;
-
-  @Prop()
-  gasConsumed: string;
+  @Prop({ required: true })
+  blockNumber: number;
 
   @Prop({ required: true })
   type: TransactionType;
 
-  @Prop()
-  execution_status: string;
-
-  @Prop()
-  finality_status: string;
-
-  @Prop({ required: true })
-  block_hash: number;
-
-  @Prop({ required: true })
-  block_number: number;
-
-  @Prop({ type: Object })
-  execution_resources: ExecutionResources;
-
-  @Prop({ required: true })
-  timestamp: number;
-
-  @Prop()
-  senderAddress: string;
-
-  @Prop()
-  maxFee: number;
-
-  @Prop()
-  version: number;
-
-  @Prop([String])
+  @Prop({ required: false, type: [String] })
   calldata: string[];
 
-  @Prop([String])
+  @Prop({ required: false })
+  actual_fee: string;
+
+  @Prop({ required: false, type: Object })
+  execution_resources: ExecutionResources;
+
+  @Prop({ type: [Object] })
+  events: EventData[];
+
+  @Prop({ required: false })
+  sender_address: string;
+
+  @Prop({ required: false })
+  unix_timestamp: number;
+
+  @Prop({ required: false })
+  timestamp: number;
+
+  @Prop({ required: false })
+  nonce: string;
+
+  @Prop({ required: false })
+  position: number;
+
+  @Prop({ required: false })
+  version: number;
+
+  @Prop({ required: false })
   signature: string[];
+
+  @Prop({ required: false })
+  max_fee: string;
+
+  @Prop({ required: false })
+  gasConsumed: string;
 }
 
 export const TransactionSchema = SchemaFactory.createForClass(Transaction);
-
-//
-//
-//
-//
-//
-//
-// messages_sent
-// events
