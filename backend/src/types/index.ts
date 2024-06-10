@@ -15,11 +15,11 @@ type ActualFee = {
   unit: string;
 };
 
-export type EventData = {
-  from_address: string;
-  keys: string[];
-  data: string[];
-};
+export interface EventData {
+  blockNumber: number;
+  timestamp: number;
+  id: string;
+}
 
 export type ExecutionResources = {
   steps: number;

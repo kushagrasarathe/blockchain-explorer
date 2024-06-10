@@ -1,6 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
+import { EventData } from 'src/types';
 import { Block } from '../models/block.model';
 import { Transaction } from '../models/transaction.model';
 import { BlockchainService } from './blockchain.service';
@@ -27,6 +28,7 @@ export class DataSyncService {
   //     await this.syncBlock(blockNumber);
   //   }
   // }
+
   async syncInitialData() {
     const latestBlock = await this.blockchainService.getLatestBlockNumber();
     await this.syncBlock(latestBlock);
@@ -46,14 +48,11 @@ export class DataSyncService {
 
     // Save transactions
     if (blockData && blockData.transactions) {
-      for (const tx of blockData.transactions) {
+      // for (const tx of blockData.transactions) {
+      for (const [index, tx] of blockData.transactions.entries()) {
         const receipt = await this.blockchainService.getTransactionReceipt(
           tx.transaction_hash,
         );
-
-        // const actual_fee = Number(receipt.actual_fee.amount);
-        // const l1GasPrice = Number(blockData.l1_gas_price.price_in_wei);
-        // const gasConsumed = actual_fee / l1GasPrice;
 
         await this.transactionModel.findOneAndUpdate(
           { transactionHash: tx.transaction_hash },
@@ -72,14 +71,11 @@ export class DataSyncService {
             unix_timestamp: blockData.timestamp,
             timestamp: blockData.timestamp,
             position: tx.position,
-
-            // actual_fee,
-            // gasConsumed: gasConsumed.toString(),
           },
           { upsert: true, new: true },
         );
 
-        await this.syncTransaction(tx, blockData);
+        await this.syncTransaction(tx, blockData, index);
       }
     }
   }
@@ -103,17 +99,27 @@ export class DataSyncService {
     }, 300000); // 5 mins
   }
 
-  async syncTransaction(tx: any, blockData: any) {
+  async syncTransaction(tx: any, blockData: any, txIndex: number) {
     const receipt = await this.blockchainService.getTransactionReceipt(
       tx.transaction_hash,
     );
 
-    // const actual_fee = receipt.actual_fee;
-    // const l1GasPrice = blockData.l1_gas_price;
-    // const gasConsumed =
-    //   Number(actual_fee.amount) / Number(l1GasPrice.price_in_wei);
+    const actual_fee = parseInt(receipt.actual_fee.amount, 16);
+    const l1GasPrice = parseInt(blockData.l1_gas_price.price_in_wei, 16);
+    const gasConsumed = actual_fee / l1GasPrice;
 
-    const txModel = await this.transactionModel.findOneAndUpdate(
+    const events = receipt.events.reduce((acc, event, index) => {
+      return [
+        ...acc,
+        {
+          id: `${receipt.block_number}_${txIndex}_${index}`,
+          timeStamp: blockData.timestamp,
+          blockNumber: receipt.block_number,
+        },
+      ];
+    }, [] as EventData[]);
+
+    await this.transactionModel.findOneAndUpdate(
       { transactionHash: tx.transaction_hash },
       {
         transactionHash: receipt.transaction_hash,
@@ -127,30 +133,16 @@ export class DataSyncService {
         signature: tx.signature,
         calldata: tx.calldata,
         execution_resources: receipt.execution_resources,
-        events: receipt.events,
+        // events: receipt.events,
+        events,
         unix_timestamp: blockData.timestamp,
         timestamp: blockData.timestamp,
         position: tx.transaction_index,
 
-        // actual_fee,
-        // gasConsumed: gasConsumed.toString(),
+        actual_fee,
+        gasConsumed: gasConsumed,
       },
       { upsert: true, new: true },
     );
-
-    // await this.syncEvents(tx.transactionHash, blockData.block_number);
-  }
-
-  async syncEvents(txHash: string, blockNumber: number) {
-    const receipt = await this.blockchainService.getTransactionReceipt(txHash);
-    for (const [index, event] of receipt.events.entries()) {
-      await this.eventModel.create({
-        transactionHash: txHash,
-        blockNumber,
-        index,
-        keys: event.keys,
-        data: event.data,
-      });
-    }
   }
 }
